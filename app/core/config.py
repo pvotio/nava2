@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    LOG_LEVEL: str = "DEBUG" 
+    LOG_LEVEL: str = "DEBUG"
     PROJECT_NAME: str = "nava2"
     API_V1: str = "/api"
     SECRET_KEY: str
