@@ -1,9 +1,10 @@
 import os
 from logging.config import dictConfig
+from ..core.config import settings
 
 
 def configure_logging() -> None:
-    level = os.getenv("LOG_LEVEL", "INFO")
+    level = settings.LOG_LEVEL
     dictConfig(
         {
             "version": 1,
