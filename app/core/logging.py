@@ -1,5 +1,5 @@
-import os
 from logging.config import dictConfig
+
 from ..core.config import settings
 
 
