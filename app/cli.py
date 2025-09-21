@@ -181,5 +181,37 @@ def create_token(
         db.close()
 
 
+@app.command("grant-admin")
+def grant_admin(email: str = typer.Option(..., "--email", "-e", help="User email")):
+    db = _db()
+    try:
+        u = _require_user(db, email)
+        if u.is_admin:
+            typer.echo(f"{email} is already admin.")
+            raise typer.Exit(code=0)
+        u.is_admin = True
+        db.add(u)
+        db.commit()
+        typer.secho(f"Granted admin to {email}", fg=typer.colors.GREEN)
+    finally:
+        db.close()
+
+
+@app.command("revoke-admin")
+def revoke_admin(email: str = typer.Option(..., "--email", "-e", help="User email")):
+    db = _db()
+    try:
+        u = _require_user(db, email)
+        if not u.is_admin:
+            typer.echo(f"{email} is not admin.")
+            raise typer.Exit(code=0)
+        u.is_admin = False
+        db.add(u)
+        db.commit()
+        typer.secho(f"Revoked admin from {email}", fg=typer.colors.GREEN)
+    finally:
+        db.close()
+
+
 if __name__ == "__main__":
     app()

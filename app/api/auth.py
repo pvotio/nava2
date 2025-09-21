@@ -14,5 +14,6 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-    token = create_access_token(subject=user.email)
+
+    token = create_access_token(subject=user.email, extra={"adm": bool(user.is_admin)})
     return Token(access_token=token)
