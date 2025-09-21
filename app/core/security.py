@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
-import timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -15,7 +14,7 @@ def create_access_token(
 ) -> str:
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    expire = datetime.now(timezone.utc) + expires_delta
+    expire = datetime.now(UTC) + expires_delta
     to_encode = {"sub": subject, "exp": expire}
     if extra:
         to_encode.update(extra)

@@ -31,6 +31,7 @@ dependencies = [
   "celery>=5.3",
   "redis>=5.0",
   "pyjwt>=2.8",
+  "alembic>=1.13",
 ]
 optional-dependencies.dev = [
   "ruff>=0.5.0",
@@ -47,12 +48,13 @@ optional-dependencies.dev = [
 [tool.black]
 line-length = 100
 target-version = ["py311"]
+extend-exclude = "alembic"
 preview = true
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["migrations"]
+extend-exclude = ["alembic"]
 lint.select = ["E","F","I","B","UP","N","D","ASYNC","A","C4","PIE","RUF"]
 lint.ignore = [
   "D100","D101","D102","D103","D104","D105","D106","D107","B008"
