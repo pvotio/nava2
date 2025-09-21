@@ -13,8 +13,10 @@ anyio==4.10.0
     #   httpx
     #   starlette
     #   watchfiles
-bcrypt==4.3.0
-    # via passlib
+bcrypt==4.0.1
+    # via
+    #   nava2 (pyproject.toml)
+    #   passlib
 billiard==4.2.1
     # via celery
 celery==5.5.3
