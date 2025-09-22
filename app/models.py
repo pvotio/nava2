@@ -25,19 +25,12 @@ class User(Base):
     is_admin = Column(Boolean, nullable=False, default=False)
 
 
-class Template(Base):
-    __tablename__ = "templates"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(100), unique=True, nullable=False)
-    description = Column(Text, default="")
-
-
 class Report(Base):
     __tablename__ = "reports"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     hash_id = Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4, index=True)
-    template_id = Column(UUID(as_uuid=True), ForeignKey("templates.id"), nullable=False)
+    template_id = Column(String(100), nullable=False, index=True)
     input_args = Column(JSONB, nullable=False, default=dict)
     status = Column(SAEnum(ReportStatus), nullable=False, default=ReportStatus.PENDING)
     output_content = Column(Text, default="")
@@ -50,4 +43,3 @@ class Report(Base):
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
     user = relationship("User")
-    template = relationship("Template")

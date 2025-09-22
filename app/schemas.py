@@ -15,7 +15,7 @@ class LoginRequest(BaseModel):
 
 
 class ReportCreate(BaseModel):
-    template_id: UUID
+    template_id: str
     input_args: dict[str, Any] = Field(default_factory=dict)
 
 
