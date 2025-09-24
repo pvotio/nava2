@@ -130,7 +130,7 @@ def list_users(
             like = f"%{q}%"
             qry = qry.filter(User.email.ilike(like))
         users = qry.order_by(User.email.asc()).limit(limit).all()
-        rows = [(u.email, u.full_name or "") for u in users]
+        rows = [(f"{u.email} {'(ADMIN)' if u.is_admin else ''}", u.full_name or "") for u in users]
         _print_table(rows, headers=("Email", "Full name"))
         typer.echo(f"Total: {len(rows)}")
     finally:
