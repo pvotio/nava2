@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
     MEDIA_DIR: str = "./media"
     BASE_URL: str = "http://localhost:8000"
+    TEMPLATES_INDEX_URL: str = "https://raw.githubusercontent.com/<org>/<repo>/<branch>/map.json"
+    GITHUB_TOKEN: str | None = None
+    TEMPLATES_SYNC_INTERVAL_MINUTES: int = 5
+    DOCS_URL: str | None = "/docs"
+    REDOC_URL: str | None = "/redoc"
+    OPENAPI_URL: str | None = "/openapi.json"
 
     class Config:
         env_file = ".env"
