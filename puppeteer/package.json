@@ -1,0 +1,22 @@
+{
+  "name": "puppeteer-service",
+  "version": "1.0.0",
+  "description": "Web service for PDF generation using Puppeteer",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [
+    "puppeteer",
+    "pdf",
+    "express",
+    "web service"
+  ],
+  "author": "Ali Moghimi",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "puppeteer": "^24.6.1"
+  }
+}
