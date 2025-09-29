@@ -41,7 +41,7 @@ def get_template(template_id: str):
 
 @router.post("/templates/sync")
 def force_sync_templates(force: bool = False):
-    registry.sync_index()
+    registry.sync_index(force=force)
     n = registry.sync_all_assets(force=force)
     return _ok(synced=n, forced=bool(force))
 
