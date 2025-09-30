@@ -21,7 +21,7 @@ def validate_report(self, template_id: str, args: dict, report_id: str):
         template_id,
     )
     try:
-        module_name, process_args = Validator(template_id, args).validate()
+        _, process_args = Validator(template_id, args).validate()
     except ValidationError as err:
         raise err
     return {
