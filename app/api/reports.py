@@ -18,7 +18,7 @@ def create_report(
     payload: ReportCreate, db: Session = Depends(get_db_dep), user=Depends(get_current_user)
 ):
     try:
-        module_name, process_args = Validator(payload.template_id, payload.input_args).validate()
+        _, process_args = Validator(payload.template_id, payload.input_args).validate()
     except ValidationError as err:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
 
