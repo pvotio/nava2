@@ -36,4 +36,3 @@ class ReportOut(BaseModel):
     hash_id: UUID
     status: str
     pdf_url: str | None = None
-    output_content: str | None = None
