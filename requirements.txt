@@ -27,6 +27,9 @@ certifi==2025.8.3
     # via
     #   httpcore
     #   httpx
+    #   requests
+charset-normalizer==3.4.3
+    # via requests
 click==8.2.1
     # via
     #   celery
@@ -66,6 +69,7 @@ idna==3.10
     #   anyio
     #   email-validator
     #   httpx
+    #   requests
 jinja2==3.1.6
     # via nava2 (pyproject.toml)
 kombu==5.5.4
@@ -119,6 +123,8 @@ pyyaml==6.0.2
     # via uvicorn
 redis==6.4.0
     # via nava2 (pyproject.toml)
+requests==2.32.5
+    # via nava2 (pyproject.toml)
 rich==14.1.0
     # via typer
 rsa==4.9.1
@@ -156,6 +162,8 @@ typing-inspection==0.4.1
     #   pydantic-settings
 tzdata==2025.2
     # via kombu
+urllib3==2.5.0
+    # via requests
 uvicorn[standard]==0.35.0
     # via nava2 (pyproject.toml)
 uvloop==0.21.0

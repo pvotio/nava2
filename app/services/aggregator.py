@@ -6,14 +6,15 @@ from typing import Any
 
 from jinja2 import BaseLoader, Environment
 
+from ..core.config import settings
 from .exceptions import (
     LogicExecutionError,
     NoDataFoundError,
     TemplateNotFoundError,
     TestExecutionError,
 )
-
-# from .mssql import MSSQLClient
+from .mssql import MSSQLClient
+from .request import session
 from .runtime import exec_module, require_callable
 from .templates_repo import registry
 
@@ -37,8 +38,8 @@ def _ensure_assets(template_id: str) -> dict:
     return assets
 
 
-# def _with_mssql() -> MSSQLClient:
-#     return MSSQLClient()
+def _with_mssql() -> MSSQLClient:
+    return MSSQLClient()
 
 
 def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[str, Any]:
@@ -48,8 +49,8 @@ def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[s
     try:
         ns_test = exec_module(test_src)
         if hasattr(ns_test, "main"):
-            # with _with_mssql() as db:
-            ok = require_callable(ns_test, "main")(process_args, False)
+            with _with_mssql() as db:
+                ok = require_callable(ns_test, "main")(process_args, db)
             if not bool(ok):
                 raise NoDataFoundError(
                     "No data found or preconditions failed (test.main returned False)."
@@ -62,8 +63,8 @@ def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[s
 
     try:
         ns = exec_module(logic_src)
-        # with _with_mssql() as db:
-        placeholders = require_callable(ns, "main")(process_args, False)
+        with _with_mssql() as db:
+            placeholders = require_callable(ns, "main")(process_args, db)
         if not isinstance(placeholders, dict):
             raise LogicExecutionError("logic.main() must return a dict of placeholders")
         return placeholders
@@ -80,8 +81,8 @@ def render_html(template_id: str, placeholders: dict[str, Any]) -> tuple[str, di
     kwargs = {
         "page_size": pdf_opts.get("page_size", "A4"),
         "orientation": pdf_opts.get("orientation", "L"),
-        "header": pdf_opts.get("header", "<div style='font-size:12px'>Header</div>"),
-        "footer": pdf_opts.get("footer", "<div style='font-size:12px'>Footer</div>"),
+        "header": pdf_opts.get("header", None),
+        "footer": pdf_opts.get("footer", None),
     }
 
     env = Environment(loader=BaseLoader(), autoescape=False)
@@ -90,3 +91,38 @@ def render_html(template_id: str, placeholders: dict[str, Any]) -> tuple[str, di
     ctx.setdefault("generated_at", datetime.now(UTC).isoformat())
     rendered = tmpl.render(**ctx)
     return rendered, kwargs
+
+
+def construct_payload(output_path: str, html: str, pdf_kwargs: dict) -> dict:
+    data = {
+        "landscape": "false",
+        "outputFilename": output_path,
+        "htmlContent": html,
+        "pageSize": pdf_kwargs.get("page_size"),
+    }
+
+    orientation = pdf_kwargs.get("orientation")
+    header = pdf_kwargs.get("header")
+    footer = pdf_kwargs.get("footer")
+
+    if orientation == "L":
+        data["landscape"] = "true"
+    if header:
+        data["headerContent"] = header
+    if footer:
+        data["footerContent"] = footer
+
+    return data
+
+
+def render_pdf(output_path, html, pdf_kwargs):
+    payload = construct_payload(output_path, html, pdf_kwargs)
+    r = session.post(f"http://{settings.GENERATOR_HOST}/generate-pdf", data=payload)
+    if r.status_code == 200:
+        logger.info(f"{output_path} generated successfully")
+        logger.debug(f"{r.json()}")
+        return True
+    else:
+        msg = r.json()["message"]
+        logger.error(f"Error executing script: {msg}")
+        return False

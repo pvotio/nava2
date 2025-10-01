@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "appuser"
     POSTGRES_PASSWORD: str = "apppass"
     MSSQL_DSN: str = ""
+    GENERATOR_HOST: str = "generator:3000"
+    REQUEST_MAX_RETRIES: int = 3
+    REQUEST_BACKOFF_FACTOR: float = 0.2
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"

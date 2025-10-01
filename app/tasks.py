@@ -50,18 +50,17 @@ def generate_html(self, data: dict):
     return data
 
 
-@celery_app.task(bind=True, name="app.tasks.generate_pdf_mock")
-def generate_pdf_mock(self, data: dict):
-    logger.debug("[task=%s] generate_pdf_mock report_id=%s", self.request.id, data.get("report_id"))
+@celery_app.task(bind=True, name="app.tasks.generate_pdf")
+def generate_pdf(self, data: dict):
+    logger.debug("[task=%s] generate_pdf report_id=%s", self.request.id, data.get("report_id"))
     report_id = data["report_id"]
     db = SessionLocal()
     try:
         r: Report | None = db.query(Report).filter(Report.id == report_id).first()
         if not r:
             raise RuntimeError(f"Report not found: {report_id}")
-        filename = f"report_{r.hash_id}.pdf"
-        # output_path = os.path.join(settings.MEDIA_DIR, filename)
-        # TODO: Call pupeteer
+        filename = f"report_{r.template_id}_{r.hash_id[:8]}.pdf"
+        aggregator.render_pdf(filename, data["html"], data["pdf_kwargs"])
         r.output_file = filename
         r.updated_at = datetime.now(UTC)
         db.add(r)
@@ -132,8 +131,8 @@ def generate_report_async(template_id: str, args: dict, report_id: str):
         | generate_html.s().set(
             link_error=handle_errors.s(stage="generate_html", report_id=report_id)
         )
-        | generate_pdf_mock.s().set(
-            link_error=handle_errors.s(stage="generate_pdf_mock", report_id=report_id)
+        | generate_pdf.s().set(
+            link_error=handle_errors.s(stage="generate_pdf", report_id=report_id)
         )
         | update_report_status.s().set(
             link_error=handle_errors.s(stage="update_report_status", report_id=report_id)
