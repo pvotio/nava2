@@ -1,3 +1,4 @@
+# app/api/reports.py
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -15,8 +16,11 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 
 @router.post("", response_model=ReportOut)
 def create_report(
-    payload: ReportCreate, db: Session = Depends(get_db_dep), user=Depends(get_current_user)
+    payload: ReportCreate,
+    db: Session = Depends(get_db_dep),
+    user=Depends(get_current_user),
 ):
+    """Create a report request (auth required)."""
     try:
         _, process_args = Validator(payload.template_id, payload.input_args).validate()
     except ValidationError as err:
@@ -32,16 +36,18 @@ def create_report(
 
 
 @router.get("/{hash_id}", response_model=ReportOut)
-def get_report(hash_id: UUID, db: Session = Depends(get_db_dep), user=Depends(get_current_user)):
-    r = db.query(Report).filter(Report.hash_id == hash_id, Report.user_id == user.id).first()
+def get_report(
+    hash_id: UUID,
+    db: Session = Depends(get_db_dep),
+):
+    """Public lookup by hash_id (no auth)."""
+    r = db.query(Report).filter(Report.hash_id == hash_id).first()
     if not r:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
-    pdf_url = None
-    if r.output_file:
-        pdf_url = f"{settings.BASE_URL}/media/{r.output_file}"
+
+    pdf_url = f"{settings.BASE_URL}/media/{r.output_file}" if r.output_file else None
     return ReportOut(
         hash_id=r.hash_id,
         status=r.status.value,
         pdf_url=pdf_url,
-        output_content=r.output_content or None,
     )
