@@ -16,7 +16,7 @@ app = FastAPI(
     openapi_url=settings.OPENAPI_URL,
 )
 
-app.mount("/media", StaticFiles(directory=settings.MEDIA_DIR), name="media")
+app.mount(settings.MEDIA_URL, StaticFiles(directory=settings.MEDIA_DIR), name="files")
 app.include_router(auth.router, prefix=settings.API_V1)
 app.include_router(reports.router, prefix=settings.API_V1)
 app.include_router(admin.router, prefix=settings.API_V1)

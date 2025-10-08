@@ -1,4 +1,3 @@
-# app/api/reports.py
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -45,7 +44,11 @@ def get_report(
     if not r:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
 
-    pdf_url = f"{settings.BASE_URL}/media/{r.output_file}" if r.output_file else None
+    pdf_url = (
+        f"{settings.BASE_URL.rstrip('/')}{settings.MEDIA_URL}/{r.output_file}"
+        if r.output_file
+        else None
+    )
     return ReportOut(
         hash_id=r.hash_id,
         status=r.status.value,
