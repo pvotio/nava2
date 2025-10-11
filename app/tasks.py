@@ -59,7 +59,9 @@ def generate_pdf(self, data: dict):
         r: Report | None = db.query(Report).filter(Report.id == report_id).first()
         if not r:
             raise RuntimeError(f"Report not found: {report_id}")
-        filename = f"report_{r.template_id}_{r.hash_id[:8]}"
+
+        _suffix = r.hash_id.hex[:8]
+        filename = f"report_{r.template_id}_{_suffix}"
         aggregator.render_pdf(filename, data["html"], data["pdf_kwargs"])
         r.output_file = filename
         r.updated_at = datetime.now(UTC)
