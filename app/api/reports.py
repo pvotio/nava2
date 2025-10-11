@@ -45,7 +45,7 @@ def get_report(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
 
     pdf_url = (
-        f"{settings.BASE_URL.rstrip('/')}{settings.MEDIA_URL}/{r.output_file}"
+        f"{settings.BASE_URL.rstrip('/')}{settings.MEDIA_URL}/{r.output_file}.pdf"
         if r.output_file
         else None
     )
