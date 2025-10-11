@@ -5,7 +5,7 @@ It enables dynamic report generation based on **external data sources** (such as
 
 ---
 
-## 🧩 Overview
+## Overview
 
 ### Key Features
 - **Async report generation** with Celery and Redis  
@@ -45,7 +45,7 @@ Also copy `db.env.example` → `db.env` for PostgreSQL container credentials.
 
 ---
 
-## 🚀 Quick Start (Docker Compose)
+## Quick Start (Docker Compose)
 
 Nava2 ships with a ready-to-run **Docker Compose** setup for local development.
 
@@ -67,7 +67,7 @@ docker compose up --build
 
 ---
 
-## 🧠 Core Concepts
+## Concepts
 
 ### 1. Templates Repository
 Each report template lives in a GitHub repo and defines:
@@ -92,7 +92,7 @@ Templates are fetched and cached in Redis. The system periodically syncs the ind
 
 ---
 
-## 🔐 Authentication
+## Authentication
 
 JWT-based authentication.
 
@@ -118,7 +118,7 @@ Explore the full OpenAPI documentation at:
 
 ---
 
-## 🧾 Media Files
+## Media Files
 
 Generated PDFs are stored inside a shared Docker volume (`media`) and served directly by the FastAPI application.
 
@@ -131,7 +131,7 @@ Generated PDFs are stored inside a shared Docker volume (`media`) and served dir
 
 ---
 
-## 🛠️ Development & Tooling
+## Development & Tooling
 
 ### Run migrations
 ```bash
@@ -153,13 +153,6 @@ docker compose logs -f worker
 ```bash
 ruff check . --fix
 ```
-
----
-
-## 🧪 Testing & QA (Planned)
-- Unit and integration tests for Celery tasks
-- Template validation against sample data
-- Linting and type checks via `ruff` and `mypy`
 
 ---
 
