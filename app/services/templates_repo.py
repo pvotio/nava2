@@ -80,9 +80,6 @@ class TemplateRegistry:
     def _resolve_file_url(self, template: dict, filename: str, force: bool = False) -> str:
         rel = f"{template['path'].rstrip('/')}/{filename.lstrip('/')}"
         url = urljoin(self.base_url, rel)
-        if force:
-            sep = "&" if "?" in url else "?"
-            url = f"{url}{sep}cb={hashlib.sha1().hexdigest()}"
         return url
 
     def _keys(self, tid: str) -> dict:
@@ -116,6 +113,10 @@ class TemplateRegistry:
         html_url = self._resolve_file_url(template, files.get("html", "template.html"), force=force)
         logic_url = self._resolve_file_url(template, files.get("logic", "logic.py"), force=force)
         test_url = self._resolve_file_url(template, files.get("test", "test.py"), force=force)
+
+        logger.debug(f"URLTEST {html_url}")
+        logger.debug(f"URLTEST {logic_url}")
+        logger.debug(f"URLTEST {test_url}")
 
         html_resp = httpx.get(html_url, headers=self._text_headers(), timeout=30)
         html_resp.raise_for_status()
