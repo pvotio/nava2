@@ -19,12 +19,9 @@ SAFE_GLOBALS = {
 
 
 def exec_module(source: str) -> SimpleNamespace:
-    module_globals: dict = dict(SAFE_GLOBALS)
-    module_locals: dict = {}
-    exec(source, module_globals, module_locals)
-    merged = dict(module_globals)
-    merged.update(module_locals)
-    return SimpleNamespace(**merged)
+    env: dict = dict(SAFE_GLOBALS)
+    exec(source, env, env)
+    return SimpleNamespace(**env)
 
 
 def require_callable(ns: SimpleNamespace, name: str):
