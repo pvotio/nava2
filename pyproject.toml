@@ -33,6 +33,7 @@ dependencies = [
   "pyjwt>=2.8",
   "alembic>=1.13",
   "requests",
+  "pandas",
 ]
 optional-dependencies.dev = [
   "ruff>=0.5.0",

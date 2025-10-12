@@ -6,7 +6,7 @@ from typing import Any
 
 import pyodbc
 
-from ..core.config import settings
+from ...core.config import settings
 
 logger = logging.getLogger(__name__)
 

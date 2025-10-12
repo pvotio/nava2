@@ -7,13 +7,14 @@ from typing import Any
 from jinja2 import BaseLoader, Environment
 
 from ..core.config import settings
+from .db.db_adapter import DBAdapter
+from .db.mssql import MSSQLClient
 from .exceptions import (
     LogicExecutionError,
     NoDataFoundError,
     TemplateNotFoundError,
     TestExecutionError,
 )
-from .mssql import MSSQLClient
 from .request import session
 from .runtime import exec_module, require_callable
 from .templates_repo import registry
@@ -38,10 +39,6 @@ def _ensure_assets(template_id: str) -> dict:
     return assets
 
 
-def _with_mssql() -> MSSQLClient:
-    return MSSQLClient()
-
-
 def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[str, Any]:
     assets = _ensure_assets(template_id)
     test_src = assets["test"]
@@ -49,8 +46,9 @@ def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[s
     try:
         ns_test = exec_module(test_src)
         if hasattr(ns_test, "main"):
-            with _with_mssql() as db:
-                ok = require_callable(ns_test, "main")(process_args, db)
+            with MSSQLClient() as db:
+                db_wrapper = DBAdapter(db)
+                ok = require_callable(ns_test, "main")(process_args, db_wrapper)
             if not bool(ok):
                 raise NoDataFoundError(
                     "No data found or preconditions failed (test.main returned False)."
@@ -63,8 +61,9 @@ def fetch_placeholders(template_id: str, process_args: dict[str, Any]) -> dict[s
 
     try:
         ns = exec_module(logic_src)
-        with _with_mssql() as db:
-            placeholders = require_callable(ns, "main")(process_args, db)
+        with MSSQLClient() as db:
+            db_wrapper = DBAdapter(db)
+            placeholders = require_callable(ns, "main")(process_args, db_wrapper)
         if not isinstance(placeholders, dict):
             raise LogicExecutionError("logic.main() must return a dict of placeholders")
         return placeholders
