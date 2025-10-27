@@ -11,14 +11,14 @@ It enables dynamic report generation based on **external data sources** (such as
 - **Async report generation** with Celery and Redis  
 - **Templated reports** defined in a remote GitHub repository  
 - **Dynamic Python logic** and validation for each report  
-- **Multi-database support** (MSSQL, PostgreSQL, MySQL, MariaDB — extensible)  
+- **Multi-database support** (MSSQL, PostgreSQL, MySQL, MariaDB - extensible)  
 - **Automated PDF rendering** using a Node.js Puppeteer microservice  
 - **Admin endpoints** for monitoring, syncing, and auditing reports  
 - **Secure authentication** via JWT with role-based access (User, Admin)
 
 ---
 
-## ⚙️ Environment Configuration
+## Environment Configuration
 
 ### Example `.env`
 
@@ -71,10 +71,10 @@ docker compose up --build
 
 ### 1. Templates Repository
 Each report template lives in a GitHub repo and defines:
-- **`map.json`** — registry of available templates, arguments, and metadata
-- **`logic.py`** — main script generating placeholders for rendering
-- **`test.py`** — optional pre-check or data validation logic
-- **`template.html`** — Jinja2-compatible HTML file for rendering
+- **`map.json`** - registry of available templates, arguments, and metadata
+- **`logic.py`** - main script generating placeholders for rendering
+- **`test.py`** - optional pre-check or data validation logic
+- **`template.html`** - Jinja2-compatible HTML file for rendering
 
 Templates are fetched and cached in Redis. The system periodically syncs the index via Celery beat.
 
