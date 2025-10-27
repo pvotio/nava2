@@ -1,4 +1,4 @@
-# Nava2 — Asynchronous Reporting Platform
+# Nava2 - Asynchronous Reporting Platform
 
 Nava2 is a **modern, asynchronous reporting platform** built with [FastAPI](https://fastapi.tiangolo.com/), [Celery](https://docs.celeryq.dev/), and [PostgreSQL](https://www.postgresql.org/).  
 It enables dynamic report generation based on **external data sources** (such as MSSQL) and customizable **Python-driven templates**, producing downloadable **PDF reports** through a headless [Puppeteer](https://pptr.dev/) service.
@@ -104,7 +104,7 @@ Public endpoints (e.g., `GET /api/reports/{hash_id}`) allow unauthenticated acce
 
 ---
 
-## 📄 Endpoints (Highlights)
+## Endpoints (Highlights)
 
 | Method | Endpoint | Description | Auth |
 |--------|-----------|-------------|------|
@@ -114,7 +114,7 @@ Public endpoints (e.g., `GET /api/reports/{hash_id}`) allow unauthenticated acce
 | **GET** | `/api/admin/reports` | List and audit reports | ✅ Admin |
 
 Explore the full OpenAPI documentation at:  
-👉 **[http://localhost:8000/docs](http://localhost:8000/docs)**
+**[http://localhost:8000/docs](http://localhost:8000/docs)**
 
 ---
 
@@ -156,7 +156,7 @@ ruff check . --fix
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions!  
 Please ensure PRs follow the existing code style and include tests when applicable.
