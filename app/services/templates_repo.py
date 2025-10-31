@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import os
 from urllib.parse import urljoin
 
 import httpx
@@ -27,6 +28,7 @@ class TemplateRegistry:
     def __init__(self):
         self.r = redis_client
         self.base_url = _parent_url(settings.TEMPLATES_INDEX_URL)
+        self.base_path = os.path.join(os.getcwd(), "templates/")
 
     def _auth_headers(self) -> dict:
         h = {"Accept": "application/json", "Cache-Control": "no-cache"}
@@ -51,6 +53,20 @@ class TemplateRegistry:
         return resp.text
 
     def sync_index(self, force: bool = False) -> dict:
+        if settings.LOAD_TEMPLATES_LOCAL:
+            return self._sync_index_local()
+        else:
+            return self._sync_index(force=force)
+
+    def _sync_index_local(self) -> dict:
+        data = json.load(open(os.path.join(self.base_path, "map.json")))
+        text = json.dumps(data)
+        etag = _sha256_hex(text)
+        self.r.set(INDEX_KEY, text)
+        self.r.set(INDEX_ETAG_KEY, etag)
+        return data
+
+    def _sync_index(self, force: bool = False) -> dict:
         text = self.fetch_remote_index_text(force=force)
         data = json.loads(text)
         etag = _sha256_hex(text)
@@ -96,6 +112,36 @@ class TemplateRegistry:
         return _sha256_hex(json.dumps(template, sort_keys=True))
 
     def fetch_and_cache_assets(self, template: dict, force: bool = False) -> None:
+        if settings.LOAD_TEMPLATES_LOCAL:
+            return self._fetch_and_cache_assets_local(template)
+        else:
+            return self._fetch_and_cache_assets(template, force)
+
+    def _fetch_and_cache_assets_local(self, template: dict) -> None:
+        tid = template["id"]
+        files = template.get("files", {})
+        keys = self._keys(tid)
+        new_etag = self._template_etag(template)
+
+        html_path = os.path.join(
+            self.base_path, template.get("path"), files.get("html", "template.html")
+        )
+        logic_path = os.path.join(
+            self.base_path, template.get("path"), files.get("logic", "logic.py")
+        )
+        test_path = os.path.join(self.base_path, template.get("path"), files.get("test", "test.py"))
+
+        html_content = open(html_path).read()
+        logic_content = open(logic_path).read()
+        test_content = open(test_path).read()
+
+        self.r.set(keys["meta"], json.dumps(template))
+        self.r.set(keys["html"], html_content)
+        self.r.set(keys["logic"], logic_content)
+        self.r.set(keys["test"], test_content)
+        self.r.set(keys["etag"], new_etag)
+
+    def _fetch_and_cache_assets(self, template: dict, force: bool = False) -> None:
         tid = template["id"]
         files = template.get("files", {})
         keys = self._keys(tid)
@@ -113,10 +159,6 @@ class TemplateRegistry:
         html_url = self._resolve_file_url(template, files.get("html", "template.html"), force=force)
         logic_url = self._resolve_file_url(template, files.get("logic", "logic.py"), force=force)
         test_url = self._resolve_file_url(template, files.get("test", "test.py"), force=force)
-
-        logger.debug(f"URLTEST {html_url}")
-        logger.debug(f"URLTEST {logic_url}")
-        logger.debug(f"URLTEST {test_url}")
 
         html_resp = httpx.get(html_url, headers=self._text_headers(), timeout=30)
         html_resp.raise_for_status()
